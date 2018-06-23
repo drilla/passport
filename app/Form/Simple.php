@@ -9,18 +9,20 @@ class Simple
 {
     /** @var [] */
     private $_formData;
+    private $_rusPassportSeries;
 
     private $_rusPassportNumber;
-
     private const TEMPLATE = 'standard.pdf';
 
 
-    public const P_ID_SERIES = 'IDSeries';
-
+    const P_ID_NUMBER = 'IDNumber';
+    const P_ID_SERIES = 'IDSeries';
     /** @var Pdf */
     private $_pdf;
 
     public function __construct() {
+
+
         $this->_pdf = new Pdf(app_path() . '/Form/Template/' . self::TEMPLATE);
     }
 
@@ -28,13 +30,8 @@ class Simple
      * @throw new Exception
      */
     public function fill(array $formData) : void {
+        $this->checkFormData($formData);
         $this->_formData = $formData;
-
-        if (!isset($formData[self::P_ID_SERIES])) {
-            throw new \InvalidArgumentException('Необходимо указать номер паспорта РФ');
-        }
-
-        $this->_rusPassportNumber = $formData[self::P_ID_SERIES];
 
         $this->_pdf
             ->needAppearances()
@@ -51,7 +48,25 @@ class Simple
     }
 
     private function _generateName() : string {
-        return str_replace(' ', '', $this->_rusPassportNumber);
+        return self::cutSpaces($this->_rusPassportSeries . $this->_rusPassportNumber);
     }
 
+    private static function cutSpaces(string $text) : string {
+        return str_replace(' ', '', $text);
+    }
+
+    private function checkFormData(array $formData) {
+        if (isset($formData[self::P_ID_SERIES])) {
+            $this->_rusPassportSeries = $formData[self::P_ID_SERIES];
+        } else {
+            throw new \InvalidArgumentException('Необходимо указать серию паспорта РФ');
+        }
+
+        if (isset($formData[self::P_ID_NUMBER])) {
+            $this->_rusPassportNumber = $formData[self::P_ID_NUMBER];
+        } else {
+            throw new \InvalidArgumentException('Необходимо указать номер паспорта РФ');
+        }
+
+    }
 }
