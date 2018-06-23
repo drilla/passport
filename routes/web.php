@@ -14,3 +14,5 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'Controller@show');
+
+Route::get('/test', 'Controller@generateFile');
