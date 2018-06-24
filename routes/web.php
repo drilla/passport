@@ -14,5 +14,6 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'Controller@index');
+Route::get('form', 'Controller@form');
 
-Route::get('/save', 'Controller@save');
+Route::get('save', 'Controller@save');
