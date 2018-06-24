@@ -24,10 +24,10 @@ class FormTest extends TestCase
 
         $this->assertFileExists($form->getSaveFilePath());
 
-        echo (PHP_EOL . 'Создан: ' . $form->getSaveFilePath() . PHP_EOL);
+        echo(PHP_EOL . 'Создан: ' . $form->getSaveFilePath() . PHP_EOL);
     }
 
-    public function fillDataProvider() : array {
+    public function fillDataProvider(): array {
         return [
             [['PGSNumber' => '09-19',
                 'LastName' => 'Иванов',
@@ -130,7 +130,7 @@ class FormTest extends TestCase
                 'JobHistoryNum' => '',
                 'FormDate' => '99.22.9999',
 
-                ]],
+            ]],
         ];
     }
 }

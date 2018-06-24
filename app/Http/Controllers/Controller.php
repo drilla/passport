@@ -2,37 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StandardForm;
+use App;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use mikehaertl\pdftk\Pdf;
 
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public function show() {
+    public function index() {
         return view('welcome');
     }
 
-    public function generateFile() {
-        $data = [
-            'PGSNumber' => "дело хуйsdf dsf"
-        ];
+    public function form() {
+        return view('form/standard');
+    }
 
-        $pdf = new Pdf('/home/drilla/Loads/form_zp.pdf');
+    public function save(StandardForm $request) {
 
+        $form = new App\Form\Simple();
 
-        $pdf
-            ->needAppearances()
-            ->fillForm($data)
-        ;
+        $form->fill($request->all());
 
-        $pdf->saveAs('/tmp/tmp_form.pdf');
+        $form->save();
 
-
-        return \response()->file('/tmp/tmp_form.pdf', 'hell.pdf');
+        return response()->file($form->getSaveFilePath());
     }
 }

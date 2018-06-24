@@ -13,6 +13,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', 'Controller@show');
+Route::get('/', 'Controller@index');
 
-Route::get('/test', 'Controller@generateFile');
+Route::get('/save', 'Controller@save');
