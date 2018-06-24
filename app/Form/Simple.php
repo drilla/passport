@@ -8,10 +8,9 @@ use mikehaertl\pdftk\Pdf;
 class Simple
 {
     /** @var [] */
-    private $_formData;
     private $_rusPassportSeries;
-
     private $_rusPassportNumber;
+
     private const TEMPLATE = 'standard.pdf';
 
 
@@ -31,7 +30,6 @@ class Simple
      */
     public function fill(array $formData) : void {
         $this->checkFormData($formData);
-        $this->_formData = $formData;
 
         $this->_pdf
             ->needAppearances()
