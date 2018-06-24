@@ -3,18 +3,29 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StandardForm extends FormRequest
 {
+    //заполняется при переходе из госуслуг - нам не нужно это
     const PSG_NUMBER = 'PGSNumber';
 
-    const P_LAST_NAME  = 'LastName';
-    const P_FIRST_NAME = 'FirstName';
-    const P_PATRONYMIC = 'Patronymic';
-    const P_BIRTH_DATE = 'BirthDate';
-    const P_BIRTHPLACE = 'Birthplace';
-    const P_GENDER     = 'Gender';
+    /**
+     * основная информация
+     */
+    const P_LAST_NAME   = 'LastName';
+    const P_FIRST_NAME  = 'FirstName';
+    const P_PATRONYMIC  = 'Patronymic';
+    const P_BIRTH_DATE  = 'BirthDate';
+    const P_BIRTH_PLACE = 'Birthplace';
+    const P_GENDER      = 'Gender';
 
+    const GENDER_MALE   = 'Male';
+    const GENDER_FEMALE = 'Female';
+
+    /**
+     * Сведения о смене имени и пола
+     */
     const P_CHANGE_PERSONAL_DATA = 'ChangePersonData';
 
     const P_OLD_LAST_NAME   = 'OldLastName';
@@ -25,6 +36,9 @@ class StandardForm extends FormRequest
     const P_CHANGE_PLACE    = 'ChangePlace';
     const P_CHANGE_INFO_NUM = 'ChangeInfoNum';
 
+    /**
+     * Сведения о регистрации
+     */
     const P_REG_REGION   = 'RegRegion';
     const P_REG_DISTRICT = 'RegDistrict';
     const P_REG_HOMETOWN = 'RegHomeTown';
@@ -35,6 +49,9 @@ class StandardForm extends FormRequest
     const P_REG_FLAT     = 'RegFlat';
     const P_REG_DATE     = 'RegDate';
 
+    /**
+     * Сведения о текущем месте пребывания
+     */
     const P_RESIDENCE        = 'Residence';
     const P_RES_REGION       = 'ResRegion';
     const P_RES_DISTRICT     = 'ResDistrict';
@@ -49,23 +66,40 @@ class StandardForm extends FormRequest
 
     const P_PHONE         = 'Phone';
     const P_EMAIL         = 'Email';
+
+    /**
+     * Паспорт РФ
+     */
     const P_ID_SERIES     = 'IDSeries';
     const P_ID_NUMBER     = 'IDNumber';
     const P_ID_ISSUE_DATE = 'IDIssueDate';
     const P_ID_ISSUER     = 'IDIssuer';
 
+    /**
+     * Был ли доступ к секретным сведениям
+     */
     const P_SECRET_ACCESS = 'SecretAccess';
     const P_SA_ORG        = 'SAOrganization';
     const P_SA_YEAR       = 'SAYear';
 
+    /**
+     * Есть ли долговые обязательства
+     */
     const P_CONTRACT_OBLIGATIONS = 'ContractObligations';
     const P_CO_ORG               = 'COOrganization';
     const P_CO_YEAR              = 'COYear';
 
+    /**
+     * Предыдущий загран паспорт
+     */
     const P_FP_SERIES     = 'FPSeries';
     const P_FP_NUMBER     = 'FPNumber';
     const P_FP_ISSUE_DATE = 'FPIssueDate';
     const P_FP_ISSUER     = 'FPIssuer';
+
+    /**
+     * Сведения о деятельности (9 шт как в форме)
+     */
 
     const P_WORK_PLACE1 = 'WorkPlace1';
     const P_ADDRESS1    = 'Address1';
@@ -112,7 +146,14 @@ class StandardForm extends FormRequest
     const P_FROM_DATE9  = 'FromDate9';
     const P_TILL_DATE9  = 'TillDate9';
 
+    /**
+     * дополнения к сведениям о деятельности - количество листов
+     */
     const P_JOB_HISTORY_NUM = 'JobHistoryNum';
+
+    /**
+     * Дата заполнения
+     */
     const P_FROM_DATE       = 'FormDate';
 
 
@@ -132,8 +173,18 @@ class StandardForm extends FormRequest
      */
     public function rules()
     {
-        return [
+        /*
+         * не будем накладывать ограничений по влезанию в строку в документе. Это редкие кейсы. только разумные ограничения
+         * 255 символов
+         */
 
+        return [
+            self::P_FIRST_NAME  => 'required|max:255',
+            self::P_LAST_NAME   => 'required|max:255',
+            self::P_PATRONYMIC  => 'required|max:255',
+            self::P_BIRTH_DATE  => 'required|max:255',
+            self::P_BIRTH_PLACE => 'required|max:255',
+            self::P_GENDER  => ['required',Rule::in([self::GENDER_MALE, self::GENDER_FEMALE])],
         ];
     }
 }

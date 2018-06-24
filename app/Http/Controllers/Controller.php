@@ -8,6 +8,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Response;
 
 class Controller extends BaseController
 {
@@ -29,6 +30,9 @@ class Controller extends BaseController
 
         $form->save();
 
-        return response()->file($form->getSaveFilePath());
+        $fileResponse = Response::file($form->getSaveFilePath());
+        $fileResponse->headers->set('Content-Type', 'application/pdf');
+
+        return $fileResponse;
     }
 }
