@@ -16,7 +16,7 @@ class FormTest extends TestCase
      */
     public function testFill(array $formData) {
 
-        $form = new App\Form\Simple();
+        $form = new App\Form\Standard();
 
         $form->fill($formData);
 

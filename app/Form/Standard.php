@@ -4,7 +4,7 @@ namespace App\Form;
 
 use mikehaertl\pdftk\Pdf;
 
-class Simple
+class Standard
 {
     /** @var [] */
     private $_rusPassportSeries;

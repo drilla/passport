@@ -23,7 +23,7 @@ class Controller extends BaseController
 
     public function save(StandardForm $request) {
 
-        $form = new App\Form\Simple();
+        $form = new App\Form\Standard();
 
         $form->fill($request->all());
 
