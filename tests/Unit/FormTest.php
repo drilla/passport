@@ -135,7 +135,7 @@ class FormTest extends TestCase
 
         return [
             [$baseCorrectSet],
-            [array_merge($baseCorrectSet, [])],
+            [array_merge($baseCorrectSet, [Form::P_LAST_NAME => null])],
         ];
     }
 }
