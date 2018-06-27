@@ -74,7 +74,7 @@ class StandardFormRequest extends TestCase
                            'ResRegDate' => '29.01.2003',
                            'ResRegExp' => '29.01.2004',
 
-                           'Phone' => '1111222233334444',
+                           'Phone' => '88003553535',
                            'Email' => '111122223333444455556666777788889999@mail.ru',
                            'IDSeries' => '2805',
                            'IDNumber' => '111111',
@@ -90,7 +90,7 @@ class StandardFormRequest extends TestCase
                            'COYear' => '2002',
 
                            'FPSeries' => '44',
-                           'FPNumber' => '24567',
+                           'FPNumber' => '2456722',
                            'FPIssueDate' => '13.12.2001',
                            'FPIssuer' => 'УФМС РОССИИ ПО ТВЕРСКОЙ ОБЛАСТИ 617',
 
@@ -140,7 +140,9 @@ class StandardFormRequest extends TestCase
 
         return [
             [$correctDataSet],
-            [array_merge($correctDataSet, ['BirthDate' => '32.01.1970',]), ['BirthDate']],
+            [array_merge($correctDataSet,  ['BirthDate' => '32.01.1970',]), ['BirthDate']],
+            [array_merge($correctDataSet,  [StandardForm::P_GENDER => 'wrong!',]), [StandardForm::P_GENDER]],
+            [array_merge($correctDataSet,  [StandardForm::P_GENDER => StandardForm::GENDER_FEMALE,])],
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Rules\DateOrTillNow;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -60,6 +61,7 @@ class StandardForm extends FormRequest
     const P_RESIDENCE         = 'Residence';
     const RESIDENCE_ACTUAL    = 'Actual';
     const RESIDENCE_TEMPORARY = 'TemporaryRegistered';
+    const RESIDENCE_DEFAULT   = 'Off'; //там же где и прописан
 
     const P_RES_REGION       = 'ResRegion';
     const P_RES_DISTRICT     = 'ResDistrict';
@@ -96,9 +98,9 @@ class StandardForm extends FormRequest
     /**
      * Есть ли долговые обязательства
      */
-    const P_CONTRACT_OBLIGATIONS = 'ContractObligations';
+    const P_CONTRACT_OBLIGATIONS   = 'ContractObligations';
     const CONTRACT_OBLIGATIONS_YES = 'COTrue';
-    const CONTRACT_OBLIGATIONS_NO = 'COFalse';
+    const CONTRACT_OBLIGATIONS_NO  = 'COFalse';
 
     const P_CO_ORG               = 'COOrganization';
     const P_CO_YEAR              = 'COYear';
@@ -170,7 +172,8 @@ class StandardForm extends FormRequest
      */
     const P_FROM_DATE = 'FormDate';
 
-    const DATE_FORMAT = 'd.m.Y';
+    const DATE_FORMAT   = 'd.m.Y';
+    const TEXT_TILL_NOW = 'Н. ВР.'; //типа по настоящее время
 
     /**
      * Determine if the user is authorized to make this request.
@@ -186,8 +189,7 @@ class StandardForm extends FormRequest
      *
      * @return array
      */
-    public function rules()
-    {
+    public function rules() {
         /*
          * не будем накладывать ограничений по влезанию в строку в документе. Это редкие кейсы. только разумные ограничения
          * 255 символов
@@ -201,30 +203,96 @@ class StandardForm extends FormRequest
             self::P_PATRONYMIC  => 'required|max:255',
             self::P_BIRTH_DATE  => 'required|' . $dateRule,
             self::P_BIRTH_PLACE => 'required|max:255',
-            self::P_GENDER  => ['required',Rule::in([self::GENDER_MALE, self::GENDER_FEMALE])],
+            self::P_GENDER      => ['required', Rule::in([self::GENDER_MALE, self::GENDER_FEMALE])],
 
             self::P_CHANGE_PERSONAL_DATA => ['required', Rule::in([self::CHANGE_PD_YES, self::CHANGE_PD_NO])],
-            self::P_OLD_LAST_NAME   => 'max:255',
-            self::P_OLD_FIRST_NAME  => 'max:255',
-            self::P_OLD_PATRONYMIC  => 'max:255',
-            self::P_OLD_GENDER      =>  [Rule::in([self::OLD_GENDER_MALE, self::OLD_GENDER_FEMALE])],
-            self::P_CHANGE_DATE     => $dateRule,
-            self::P_CHANGE_PLACE    => 'max:255',
-            self::P_CHANGE_INFO_NUM => 'max:1',
+            self::P_OLD_LAST_NAME        => 'max:255',
+            self::P_OLD_FIRST_NAME       => 'max:255',
+            self::P_OLD_PATRONYMIC       => 'max:255',
+            self::P_OLD_GENDER           => [Rule::in([self::OLD_GENDER_MALE, self::OLD_GENDER_FEMALE])],
+            self::P_CHANGE_DATE          => $dateRule,
+            self::P_CHANGE_PLACE         => 'max:255',
+            self::P_CHANGE_INFO_NUM      => 'digits:1',
 
             self::P_REG_REGION   => 'required|max:255',
-            self::P_REG_DISTRICT => 'required|max:255',
+            self::P_REG_DISTRICT => 'max:255',
             self::P_REG_HOMETOWN => 'required|max:255',
-            self::P_REG_STREET   => 'required|max:255',
+            self::P_REG_STREET   => 'max:255',
             self::P_REG_HOUSE    => 'required|max:255',
-            self::P_REG_HOUSING  => 'required|max:255',
-            self::P_REG_BUILDING => 'required|max:255',
-            self::P_REG_FLAT     => 'required|max:255',
-            self::P_REG_DATE     => 'required|' . $dateRule
+            self::P_REG_HOUSING  => 'max:255',
+            self::P_REG_BUILDING => 'max:255',
+            self::P_REG_FLAT     => 'digits:4',
+            self::P_REG_DATE     => 'required|' . $dateRule,
 
+            self::P_RESIDENCE        => [Rule::in([self::RESIDENCE_TEMPORARY, self::RESIDENCE_DEFAULT, self::RESIDENCE_ACTUAL])],
+            self::P_RES_REGION       => 'max:255',
+            self::P_RES_DISTRICT     => 'max:255',
+            self::P_RES_HOMETOWN     => 'max:255',
+            self::P_RES_STREET       => 'max:255',
+            self::P_RES_HOUSE        => 'max:6',
+            self::P_RES_HOUSING      => 'max:3',
+            self::P_RES_BUILDING     => 'max:3',
+            self::P_RES_FLAT         => 'digits:4',
+            self::P_RES_REG_DATE     => $dateRule,
+            self::P_RES_REG_DATE_EXP => $dateRule,
 
+            self::P_PHONE => 'digits:11',
+            self::P_EMAIL => 'email',
 
+            self::P_ID_SERIES            => 'required|digits:4',
+            self::P_ID_NUMBER            => 'required|digits:6',
+            self::P_ID_ISSUE_DATE        => 'required|required|' . $dateRule,
+            self::P_ID_ISSUER            => 'required|max:255',
 
+            self::P_SECRET_ACCESS        => [Rule::in([self::SECRET_ACCESS_YES, self::SECRET_ACCESS_NO])],
+            self::P_SA_ORG               => 'max:255|required_with:' . self::P_SECRET_ACCESS,
+            self::P_SA_YEAR              => 'integer|max:2099|required_with:'. self::P_SECRET_ACCESS,
+
+            self::P_CONTRACT_OBLIGATIONS => [Rule::in([self::CONTRACT_OBLIGATIONS_YES, self::CONTRACT_OBLIGATIONS_NO])],
+            self::P_CO_ORG               => 'max:255|required_with:' . self::P_CONTRACT_OBLIGATIONS,
+            self::P_CO_YEAR              => 'integer|max:2099|required_with:'. self::P_CONTRACT_OBLIGATIONS,
+
+            self::P_FP_SERIES            => 'digits:2|required_with:'.implode(',', [self::P_FP_NUMBER, self::P_FP_ISSUER, self::P_FP_ISSUE_DATE]),
+            self::P_FP_NUMBER            => 'digits:7|required_with:'.implode(',', [ self::P_FP_ISSUER, self::P_FP_ISSUE_DATE, self::P_FP_SERIES]),
+            self::P_FP_ISSUE_DATE        =>  $dateRule . '|required_with:'.implode(',', [self::P_FP_NUMBER, self::P_FP_ISSUER, self::P_FP_SERIES]),
+            self::P_FP_ISSUER            => 'max:255|required_with:'.implode(',', [self::P_FP_NUMBER, self::P_FP_ISSUE_DATE, self::P_FP_SERIES]),
+
+            self::P_WORK_PLACE1          => 'max:255',
+            self::P_ADDRESS1             => 'max:255',
+            self::P_FROM_DATE1           => $dateRule,
+            self::P_TILL_DATE1           => [new DateOrTillNow(self::DATE_FORMAT, self::TEXT_TILL_NOW)],
+            self::P_WORK_PLACE2          => 'max:255',
+            self::P_ADDRESS2             => 'max:255',
+            self::P_FROM_DATE2           => $dateRule,
+            self::P_TILL_DATE2           => [new DateOrTillNow(self::DATE_FORMAT, self::TEXT_TILL_NOW)],
+            self::P_WORK_PLACE3          => 'max:255',
+            self::P_ADDRESS3             => 'max:255',
+            self::P_FROM_DATE3           => $dateRule,
+            self::P_TILL_DATE3           => [new DateOrTillNow(self::DATE_FORMAT, self::TEXT_TILL_NOW)],
+            self::P_WORK_PLACE4          => 'max:255',
+            self::P_ADDRESS4             => 'max:255',
+            self::P_FROM_DATE4           => $dateRule,
+            self::P_TILL_DATE4           => [new DateOrTillNow(self::DATE_FORMAT, self::TEXT_TILL_NOW)],
+            self::P_WORK_PLACE5          => 'max:255',
+            self::P_ADDRESS5             => 'max:255',
+            self::P_FROM_DATE5           => $dateRule,
+            self::P_TILL_DATE5           => [new DateOrTillNow(self::DATE_FORMAT, self::TEXT_TILL_NOW)],
+            self::P_WORK_PLACE6          => 'max:255',
+            self::P_ADDRESS6             => 'max:255',
+            self::P_FROM_DATE6           => $dateRule,
+            self::P_TILL_DATE6           => [new DateOrTillNow(self::DATE_FORMAT, self::TEXT_TILL_NOW)],
+            self::P_WORK_PLACE7          => 'max:255',
+            self::P_ADDRESS7             => 'max:255',
+            self::P_FROM_DATE7           => $dateRule,
+            self::P_TILL_DATE7           => [new DateOrTillNow(self::DATE_FORMAT, self::TEXT_TILL_NOW)],
+            self::P_WORK_PLACE8          => 'max:255',
+            self::P_ADDRESS8             => 'max:255',
+            self::P_FROM_DATE8           => $dateRule,
+            self::P_TILL_DATE8           => [new DateOrTillNow(self::DATE_FORMAT, self::TEXT_TILL_NOW)],
+            self::P_WORK_PLACE9          => 'max:255',
+            self::P_ADDRESS9             => 'max:255',
+            self::P_FROM_DATE9           => $dateRule,
+            self::P_TILL_DATE9           => [new DateOrTillNow(self::DATE_FORMAT, self::TEXT_TILL_NOW)],
         ];
     }
 }
